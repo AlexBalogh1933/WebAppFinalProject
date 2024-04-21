@@ -1,0 +1,22 @@
+@MinimalApiHost = https://localhost:7196
+
+
+
+
+GET {{MinimalApiHost}}/api/books
+
+###
+
+POST {{MinimalApiHost}}/api/book
+Content-Type: application/json
+
+{
+  "Title": "alex",
+  "Author": "grave",
+  "Publisher": "john",
+  "Genre": "no"
+}
+
+###
+
+

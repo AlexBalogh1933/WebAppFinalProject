@@ -1,0 +1,37 @@
+﻿@page "/editBook/{bookId:int}"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Book Editor</h3>
+
+<EditForm Model="@book" OnValidSubmit="HandleValidSubmit" FormName="BookForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentNumberField @bind-Value="book.BookId" Label="bookID" TValue="int" ReadOnly></FluentNumberField>
+        <FluentTextField @bind-Value="book.Title" Label="Title"></FluentTextField>
+        <FluentTextField @bind-Value="book.Genre" Label="Genre"></FluentTextField>
+        <FluentTextField @bind-Value="book.Publisher" Label="Publisher"></FluentTextField>
+        <FluentTextField @bind-Value="book.Author" Label="Author"></FluentTextField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/bookList"))">Cancel</FluentButton>
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [Parameter]
+    public int bookId { get; set; }
+    [SupplyParameterFromForm]
+    public BookViewModel book { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        book = await http.GetFromJsonAsync<BookViewModel>($"/api/book/{bookId}");
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PutAsJsonAsync($"/api/book/{bookId}", book);
+    }
+}

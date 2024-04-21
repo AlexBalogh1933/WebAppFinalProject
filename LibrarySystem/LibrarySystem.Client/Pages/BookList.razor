@@ -1,0 +1,43 @@
+﻿@page "/booklist"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Current Books</h3>
+<FluentButton OnClick="@(()=> navigation.NavigateTo("/addBook"))">Add Book</FluentButton>
+
+<FluentDataGrid Items="@books" AdditionalAttributes="formStyle">
+    <PropertyColumn Property="@(b => b.BookId)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.Title)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.Publisher)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.Genre)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.Author)" Sortable="true" />
+  
+    <TemplateColumn>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.BookId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> RemoveBook(context.BookId))">Remove</FluentButton>
+    </TemplateColumn>
+
+
+</FluentDataGrid>
+@code {
+    public IQueryable<BookViewModel> books { get; set; }
+    protected override async Task OnParametersSetAsync()
+    {
+        books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+    }
+
+    Dictionary<string, object> formStyle { get; set; } = new()
+    {
+        {"width", "100"}
+    };
+
+    private async Task RemoveBook(int bookId)
+    {
+
+        await http.DeleteAsync($"/api/book/{bookId}");
+        books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+
+    }
+
+}

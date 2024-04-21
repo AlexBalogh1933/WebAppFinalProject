@@ -1,0 +1,31 @@
+﻿@page "/addBook"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>New Book Form</h3>
+
+<EditForm Model="@book" OnValidSubmit="HandleValidSubmit" FormName="BookForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentTextField @bind-Value="book.Title" Label="Title"></FluentTextField>
+        <FluentTextField @bind-Value="book.Genre" Label="Genre"></FluentTextField>
+        <FluentTextField @bind-Value="book.Publisher" Label="Publisher"></FluentTextField>
+        <FluentTextField @bind-Value="book.Author" Label="Author"></FluentTextField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/bookList"))">Cancel</FluentButton>
+
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public BookViewModel book { get; set; } = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PostAsJsonAsync($"/api/book/", book);
+    }
+}
+
