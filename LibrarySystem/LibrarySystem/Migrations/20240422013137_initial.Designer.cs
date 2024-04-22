@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibrarySystem.Migrations
 {
     [DbContext(typeof(LibrarySystemDbContext))]
-    [Migration("20240420210312_Initial")]
-    partial class Initial
+    [Migration("20240422013137_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,18 +27,22 @@ namespace LibrarySystem.Migrations
 
                     b.Property<string>("Author")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Genre")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Publisher")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.HasKey("BookId");
@@ -53,6 +57,47 @@ namespace LibrarySystem.Migrations
                             Genre = "Comedy",
                             Publisher = "Houghton Mifflin",
                             Title = "Cat in the hat"
+                        });
+                });
+
+            modelBuilder.Entity("LibrarySystem.Entities.Patron", b =>
+                {
+                    b.Property<int>("PatronId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PatronId");
+
+                    b.ToTable("Patrons");
+
+                    b.HasData(
+                        new
+                        {
+                            PatronId = 1,
+                            Address = "1225 Green Street",
+                            FirstName = "David",
+                            LastName = "Toran",
+                            PhoneNumber = "5137784564"
                         });
                 });
 #pragma warning restore 612, 618
