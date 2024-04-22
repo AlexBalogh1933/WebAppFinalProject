@@ -4,46 +4,109 @@
 @inject NavigationManager navigation
 
 <h3>Current Books</h3>
-<FluentStack Orientation="Orientation.Horizontal">
-    <FluentCard>
-        <FluentTextField Label="Search Book" @oninput="FindBook"></FluentTextField>
 
-        <FluentButton OnClick="@(()=> navigation.NavigateTo("/addBook"))">Add Book</FluentButton>
+<FluentCard Width="Auto" Height="350px">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentCard>
 
-    </FluentCard>
-</FluentStack>
+            <FluentTextField Label="Search Book" @oninput="FindBook"></FluentTextField>
+            <br />
+            <br />
 
+            <FluentSelect Label="Search Parameter Options" ValueChanged="@(e => FilterSearchOption = e)" TOption="string">
+                <FluentOption Value="author">Author</FluentOption>
+                <FluentOption Value="title">Title</FluentOption>
+                <FluentOption Value="genre">Genre</FluentOption>
+                <FluentOption Value="publisher">Publisher</FluentOption>
+            </FluentSelect>
 
-<FluentDataGrid Items="@books" AdditionalAttributes="formStyle" >
-  
+            <br />
+            <br />
+
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/addBook"))">Add Book</FluentButton>
+
+            <br />
+            <br />
+
+            <FluentCheckbox @bind-Value="hideTitleColumn">Hide Titles</FluentCheckbox>
+            <FluentCheckbox @bind-Value="hideAuthorColumn">Hide Authors</FluentCheckbox>
+            <FluentCheckbox @bind-Value="hidePublisherColumn">Hide Publishers</FluentCheckbox>
+            <FluentCheckbox @bind-Value="hideGenreColumn">Hide Genres</FluentCheckbox>
+
+        </FluentCard>
+    </FluentStack>
+</FluentCard>
+
+<FluentDataGrid Items="@books" >
+
     <PropertyColumn Property="@(b => b.BookId)" Sortable="true" />
-    <PropertyColumn Property="@(b => b.Title)" Sortable="true" />
-    <PropertyColumn Property="@(b => b.Publisher)" Sortable="true" />
-    <PropertyColumn Property="@(b => b.Genre)" Sortable="true" />
-    <PropertyColumn Property="@(b => b.Author)" Sortable="true" />
-  
+    
+    @if (!hideTitleColumn)
+    {
+        <PropertyColumn Property="@(b => b.Title)" Sortable="true" />
+    }
+    @if (!hideAuthorColumn)
+    {
+        <PropertyColumn Property="@(b => b.Author)" Sortable="true" />
+    }
+    @if (!hidePublisherColumn)
+    {
+        <PropertyColumn Property="@(b => b.Publisher)" Sortable="true" />
+    }
+    @if (!hideGenreColumn)
+    {
+        <PropertyColumn Property="@(b => b.Genre)" Sortable="true" />
+    }
+
     <TemplateColumn>
         <FluentButton OnClick="@(()=> navigation.NavigateTo($"/editBook/{context.BookId}"))">Edit</FluentButton>
         <FluentButton OnClick="@(()=> RemoveBook(context.BookId))">Remove</FluentButton>
     </TemplateColumn>
 
-
 </FluentDataGrid>
+
 @code {
     public IQueryable<BookViewModel> books { get; set; }
 
+    private bool displayBook = true;
+
+    bool hideTitleColumn = false;
+    bool hideGenreColumn = false;
+    bool hidePublisherColumn = false;
+    bool hideAuthorColumn = false;
+
+    string? FilterSearchOption = "author";
+
     private async Task FindBook(ChangeEventArgs args)
     {
-        var filter = args.Value as string;
+        var input = args.Value.ToString();
+        
 
-        if (string.IsNullOrWhiteSpace(filter))
+        if (string.IsNullOrWhiteSpace(input))
         {
             books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
         }
         else
         {
-            books = books.Where(x => x.Title.Contains(filter)).AsQueryable();
+            books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
 
+            if (FilterSearchOption == "author")
+            {
+                books = books.Where(b => b.Author.ToLower().StartsWith(input)).AsQueryable();
+            }
+            else if (FilterSearchOption == "title")
+            {
+                books = books.Where(b => b.Title.ToLower().StartsWith(input)).AsQueryable();
+            }
+            else if (FilterSearchOption == "publisher")
+            {
+                books = books.Where(b => b.Publisher.ToLower().StartsWith(input)).AsQueryable();
+            }
+            else if (FilterSearchOption == "genre")
+            {
+                books = books.Where(b => b.Genre.ToLower().StartsWith(input)).AsQueryable();
+
+            }
         }
     }
 
@@ -52,15 +115,9 @@
         books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
     }
 
-    Dictionary<string, object> formStyle { get; set; } = new()
-    {
-        {"width", "100"}
-    };
-
     private async Task RemoveBook(int bookId)
     {
         await http.DeleteAsync($"/api/book/{bookId}");
         books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
     }
-
 }
