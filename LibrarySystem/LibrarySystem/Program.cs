@@ -18,8 +18,8 @@ builder.Services.AddFluentUIComponents();
 
 builder.Services.AddDbContext<LibrarySystemDbContext>(options =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("sqlite");
-    options.UseSqlite(connectionString);
+    var connectionString = builder.Configuration.GetConnectionString("LibDB");
+    options.UseSqlServer(connectionString);
 });
 
 var app = builder.Build();

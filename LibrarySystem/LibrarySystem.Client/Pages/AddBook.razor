@@ -26,6 +26,7 @@
     private async Task HandleValidSubmit()
     {
         await http.PostAsJsonAsync($"/api/book/", book);
+        navigation.NavigateTo("/bookList");
     }
 }
 

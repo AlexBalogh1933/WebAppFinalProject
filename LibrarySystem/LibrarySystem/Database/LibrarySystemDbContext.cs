@@ -21,5 +21,8 @@ namespace LibrarySystem.Database
                 new Patron { PatronId = 1, FirstName = "David", LastName = "Toran", Address = "1225 Green Street", PhoneNumber = "5137784564" }
             );
         }
+        public DbSet<LibrarySystem.Entities.Transaction> Transaction { get; set; } = default!;
+        public DbSet<LibrarySystem.Entities.Author> Author { get; set; } = default!;
+        public DbSet<LibrarySystem.Entities.Publisher> Publisher { get; set; } = default!;
     }
 }

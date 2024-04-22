@@ -23,7 +23,7 @@
     <PropertyColumn Property="@(b => b.Author)" Sortable="true" />
   
     <TemplateColumn>
-        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.BookId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/editBook/{context.BookId}"))">Edit</FluentButton>
         <FluentButton OnClick="@(()=> RemoveBook(context.BookId))">Remove</FluentButton>
     </TemplateColumn>
 
