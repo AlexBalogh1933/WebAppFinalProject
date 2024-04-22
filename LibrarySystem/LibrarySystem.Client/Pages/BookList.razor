@@ -4,9 +4,18 @@
 @inject NavigationManager navigation
 
 <h3>Current Books</h3>
-<FluentButton OnClick="@(()=> navigation.NavigateTo("/addBook"))">Add Book</FluentButton>
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentCard>
+        <FluentTextField Label="Search Book" @oninput="FindBook"></FluentTextField>
 
-<FluentDataGrid Items="@books" AdditionalAttributes="formStyle">
+        <FluentButton OnClick="@(()=> navigation.NavigateTo("/addBook"))">Add Book</FluentButton>
+
+    </FluentCard>
+</FluentStack>
+
+
+<FluentDataGrid Items="@books" AdditionalAttributes="formStyle" >
+  
     <PropertyColumn Property="@(b => b.BookId)" Sortable="true" />
     <PropertyColumn Property="@(b => b.Title)" Sortable="true" />
     <PropertyColumn Property="@(b => b.Publisher)" Sortable="true" />
@@ -22,6 +31,22 @@
 </FluentDataGrid>
 @code {
     public IQueryable<BookViewModel> books { get; set; }
+
+    private async Task FindBook(ChangeEventArgs args)
+    {
+        var filter = args.Value as string;
+
+        if (string.IsNullOrWhiteSpace(filter))
+        {
+            books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+        }
+        else
+        {
+            books = books.Where(x => x.Title.Contains(filter)).AsQueryable();
+
+        }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
@@ -34,10 +59,8 @@
 
     private async Task RemoveBook(int bookId)
     {
-
         await http.DeleteAsync($"/api/book/{bookId}");
         books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
-
     }
 
 }
