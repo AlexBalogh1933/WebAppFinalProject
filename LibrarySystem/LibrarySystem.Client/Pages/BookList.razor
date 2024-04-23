@@ -64,6 +64,7 @@
     </TemplateColumn>
 
 </FluentDataGrid>
+
 @code {
     public IQueryable<BookViewModel> books { get; set; }
 
@@ -119,5 +120,4 @@
         await http.DeleteAsync($"/api/book/{bookId}");
         books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
     }
-
 }
