@@ -1,0 +1,30 @@
+﻿@page "/addPublisher"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Add Publisher</h3>
+
+<EditForm Model="@publisher" OnValidSubmit="HandleValidSubmit" FormName="PublisherForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentTextField @bind-Value="publisher.Name" Label="Name"></FluentTextField>
+        <FluentTextField @bind-Value="publisher.Address" Label="Address"></FluentTextField>
+        <FluentNumberField @bind-Value="publisher.EstablishedYear" Label="Established Year"></FluentNumberField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/publisherList"))">Cancel</FluentButton>
+
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public PublisherViewModel publisher { get; set; } = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PostAsJsonAsync($"/api/publisher/", publisher);
+        navigation.NavigateTo("/publisherList");
+    }
+}

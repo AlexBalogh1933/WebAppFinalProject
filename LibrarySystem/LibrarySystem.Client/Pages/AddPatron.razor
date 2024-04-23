@@ -1,0 +1,31 @@
+﻿@page "/addPatron"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Add Patron</h3>
+
+<EditForm Model="@patron" OnValidSubmit="HandleValidSubmit" FormName="PatronForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentTextField @bind-Value="patron.FirstName" Label="First Name"></FluentTextField>
+        <FluentTextField @bind-Value="patron.LastName" Label="Last Name"></FluentTextField>
+        <FluentTextField @bind-Value="patron.Address" Label="Address"></FluentTextField>
+        <FluentTextField @bind-Value="patron.PhoneNumber" Label="Phone Number"></FluentTextField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/patronList"))">Cancel</FluentButton>
+
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public PatronViewModel patron { get; set; } = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PostAsJsonAsync($"/api/patron/", patron);
+        navigation.NavigateTo("/patronList");
+    }
+}

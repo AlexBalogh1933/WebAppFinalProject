@@ -10,8 +10,8 @@
         <FluentNumberField @bind-Value="book.BookId" Label="bookID" TValue="int" ReadOnly></FluentNumberField>
         <FluentTextField @bind-Value="book.Title" Label="Title"></FluentTextField>
         <FluentTextField @bind-Value="book.Genre" Label="Genre"></FluentTextField>
-        <FluentTextField @bind-Value="book.Publisher" Label="Publisher"></FluentTextField>
-        <FluentTextField @bind-Value="book.Author" Label="Author"></FluentTextField>
+        <FluentNumberField @bind-Value="book.PublisherId" Label="Publisher"></FluentNumberField>
+        <FluentNumberField @bind-Value="book.AuthorId" Label="Author"></FluentNumberField>
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentButton Type="ButtonType.Submit">Save</FluentButton>
             <FluentButton OnClick="@(()=> navigation.NavigateTo("/bookList"))">Cancel</FluentButton>

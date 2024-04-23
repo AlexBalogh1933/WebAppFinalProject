@@ -1,0 +1,30 @@
+﻿@page "/addAuthor"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>AddAuthor</h3>
+
+<EditForm Model="@author" OnValidSubmit="HandleValidSubmit" FormName="AuthorForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentTextField @bind-Value="author.FirstName" Label="First Name"></FluentTextField>
+        <FluentTextField @bind-Value="author.LastName" Label="Last Name"></FluentTextField>
+        <FluentNumberField @bind-Value="author.Publications" Label="Publication"></FluentNumberField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/authorList"))">Cancel</FluentButton>
+
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public AuthorViewModel author { get; set; } = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PostAsJsonAsync($"/api/author/", author);
+        navigation.NavigateTo("/authorList");
+    }
+}

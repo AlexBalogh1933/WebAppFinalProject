@@ -1,0 +1,66 @@
+﻿@page "/patronList"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>List of Patrons</h3>
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentCard>
+        <FluentTextField Label="Search Patrons" @oninput="FindPatrons"></FluentTextField>
+
+        <FluentButton OnClick="@(()=> navigation.NavigateTo("/addPatron"))">Add Patrons</FluentButton>
+
+    </FluentCard>
+</FluentStack>
+
+<FluentDataGrid Items="@patrons" AdditionalAttributes="formStyle">
+
+    <PropertyColumn Property="@(b => b.PatronId)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.FirstName)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.LastName)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.Address)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.PhoneNumber)" Sortable="true" />
+
+    <TemplateColumn>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/editPatron/{context.PatronId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> RemoveAuthor(context.PatronId))">Remove</FluentButton>
+    </TemplateColumn>
+
+
+</FluentDataGrid>
+
+@code {
+    public IQueryable<PatronViewModel> patrons { get; set; }
+
+    private async Task FindPatrons(ChangeEventArgs args)
+    {
+        var filter = args.Value as string;
+
+        if (string.IsNullOrWhiteSpace(filter))
+        {
+            patrons = (await http.GetFromJsonAsync<List<PatronViewModel>>("api/patrons")).AsQueryable();
+        }
+        else
+        {
+            patrons = patrons.Where(x => x.LastName.Contains(filter)).AsQueryable();
+
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        patrons = (await http.GetFromJsonAsync<List<PatronViewModel>>("api/patrons")).AsQueryable();
+    }
+
+    Dictionary<string, object> formStyle { get; set; } = new()
+    {
+        {"width", "100"}
+    };
+
+    private async Task RemoveAuthor(int authorId)
+    {
+        await http.DeleteAsync($"/api/[patron]/{authorId}");
+        patrons = (await http.GetFromJsonAsync<List<PatronViewModel>>("api/patrons")).AsQueryable();
+    }
+
+}
