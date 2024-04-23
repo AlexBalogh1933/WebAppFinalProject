@@ -1,0 +1,37 @@
+﻿@page "/transactionDetails/{transactionId:int}"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Publisher Editor</h3>
+
+<EditForm Model="@transaction" OnValidSubmit="HandleValidSubmit" FormName="TransactionForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentNumberField @bind-Value="transaction.TransactionId" Label="transactionId" TValue="int" ReadOnly></FluentNumberField>
+        <FluentDatePicker @bind-Value="transaction.ReturnDate" Label="Return Date"></FluentDatePicker>
+        <FluentNumberField @bind-Value="transaction.PatronId" Label="Patron Id"></FluentNumberField>
+        <FluentNumberField @bind-Value="transaction.BookId" Label="Book Id"></FluentNumberField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/transactionList"))">Cancel</FluentButton>
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [Parameter]
+    public int transactionId { get; set; }
+    [SupplyParameterFromForm]
+    public TransactionViewModel transaction { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        transaction = await http.GetFromJsonAsync<TransactionViewModel>($"/api/transaction/{transactionId}");
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PutAsJsonAsync($"/api/transaction/{transactionId}", transaction);
+        navigation.NavigateTo("/transactionList");
+    }
+}

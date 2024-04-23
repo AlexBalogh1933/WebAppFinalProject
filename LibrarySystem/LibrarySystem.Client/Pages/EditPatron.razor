@@ -1,0 +1,38 @@
+﻿@page "/patronDetails/{patronId:int}"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Patron Editor</h3>
+
+<EditForm Model="@patron" OnValidSubmit="HandleValidSubmit" FormName="AuthorForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentNumberField @bind-Value="patron.PatronId" Label="patronId" TValue="int" ReadOnly></FluentNumberField>
+        <FluentTextField @bind-Value="patron.FirstName" Label="First Name"></FluentTextField>
+        <FluentTextField @bind-Value="patron.LastName" Label="Last Name"></FluentTextField>
+        <FluentTextField @bind-Value="patron.Address" Label="Address"></FluentTextField>
+        <FluentTextField @bind-Value="patron.PhoneNumber" Label="Phone Number"></FluentTextField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/patronList"))">Cancel</FluentButton>
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [Parameter]
+    public int patronId { get; set; }
+    [SupplyParameterFromForm]
+    public PatronViewModel patron { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        patron = await http.GetFromJsonAsync<PatronViewModel>($"/api/patron/{patronId}");
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PutAsJsonAsync($"/api/patron/{patronId}", patron);
+        navigation.NavigateTo("/patronList");
+    }
+}

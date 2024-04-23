@@ -1,4 +1,4 @@
-﻿@page "/editBook/{bookId:int}"
+﻿@page "/bookDetails/{bookId:int}"
 @using LibrarySystem.Models
 @inject HttpClient http
 @inject NavigationManager navigation
@@ -33,5 +33,6 @@
     private async Task HandleValidSubmit()
     {
         await http.PutAsJsonAsync($"/api/book/{bookId}", book);
+        navigation.NavigateTo("/bookList");
     }
 }

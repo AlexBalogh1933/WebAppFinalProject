@@ -22,7 +22,7 @@
     <PropertyColumn Property="@(b => b.PhoneNumber)" Sortable="true" />
 
     <TemplateColumn>
-        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/editPatron/{context.PatronId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/patronDetails/{context.PatronId}"))">Edit</FluentButton>
         <FluentButton OnClick="@(()=> RemovePatron(context.PatronId))">Remove</FluentButton>
     </TemplateColumn>
 
