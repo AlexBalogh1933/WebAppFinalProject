@@ -1,0 +1,30 @@
+﻿@page "/addTransaction"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>Add Transaction</h3>
+
+<EditForm Model="@transaction" OnValidSubmit="HandleValidSubmit" FormName="TransactionForm">
+    <FluentStack Orientation="Orientation.Vertical">
+        <FluentNumberField @bind-Value="transaction.ReturnDate" Label="Return Date"></FluentNumberField>
+        <FluentNumberField @bind-Value="transaction.PatronId" Label="PatronId"></FluentNumberField>
+        <FluentNumberField @bind-Value="transaction.BookId" Label="BookId"></FluentNumberField>
+        <FluentStack Orientation="Orientation.Horizontal">
+            <FluentButton Type="ButtonType.Submit">Save</FluentButton>
+            <FluentButton OnClick="@(()=> navigation.NavigateTo("/transactionList"))">Cancel</FluentButton>
+
+        </FluentStack>
+
+    </FluentStack>
+</EditForm>
+@code {
+    [SupplyParameterFromForm]
+    public TransactionViewModel transaction { get; set; } = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await http.PostAsJsonAsync($"/api/transaction/", transaction);
+        navigation.NavigateTo("/transactionList");
+    }
+}

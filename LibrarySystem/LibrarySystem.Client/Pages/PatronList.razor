@@ -59,7 +59,7 @@
 
     private async Task RemoveAuthor(int authorId)
     {
-        await http.DeleteAsync($"/api/[patron]/{authorId}");
+        await http.DeleteAsync($"/api/patron/{authorId}");
         patrons = (await http.GetFromJsonAsync<List<PatronViewModel>>("api/patrons")).AsQueryable();
     }
 

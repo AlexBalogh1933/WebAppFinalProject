@@ -13,6 +13,7 @@ namespace LibrarySystem.Database
         public DbSet<Author> Authors { get; set; }
         public DbSet<Patron> Patrons { get; set; }
         public DbSet<Entities.Publisher> Publishers { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

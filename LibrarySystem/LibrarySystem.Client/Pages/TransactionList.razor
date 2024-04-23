@@ -1,0 +1,65 @@
+﻿@page "/transactionList"
+@using LibrarySystem.Models
+@inject HttpClient http
+@inject NavigationManager navigation
+
+<h3>List of Transactions</h3>
+<FluentStack Orientation="Orientation.Horizontal">
+    <FluentCard>
+        @* <FluentTextField Label="Search Transaction" @oninput="FindTransaction"></FluentTextField> *@
+
+        <FluentButton OnClick="@(()=> navigation.NavigateTo("/addTransaction"))">Add Transaction</FluentButton>
+
+    </FluentCard>
+</FluentStack>
+
+<FluentDataGrid Items="@transactions" AdditionalAttributes="formStyle">
+
+    <PropertyColumn Property="@(b => b.TransactionId)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.ReturnDate)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.PatronId)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.BookId)" Sortable="true" />
+
+    <TemplateColumn>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/editTransaction/{context.TransactionId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> RemoveTransaction(context.TransactionId))">Remove</FluentButton>
+    </TemplateColumn>
+
+
+</FluentDataGrid>
+
+@code {
+    public IQueryable<TransactionViewModel> transactions { get; set; }
+
+    // private async Task FindTransaction(ChangeEventArgs args)
+    // {
+    //     var filter = args.Value as string;
+
+    //     if (string.IsNullOrWhiteSpace(filter))
+    //     {
+    //         transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
+    //     }
+    //     else
+    //     {
+    //         transactions = transactions.Where(x => x.TransactionId.Contains(filter)).AsQueryable();
+
+    //     }
+    // }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
+    }
+
+    Dictionary<string, object> formStyle { get; set; } = new()
+    {
+        {"width", "100"}
+    };
+
+    private async Task RemoveTransaction(int transactionId)
+    {
+        await http.DeleteAsync($"/api/transaction/{transactionId}");
+        transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
+    }
+
+}

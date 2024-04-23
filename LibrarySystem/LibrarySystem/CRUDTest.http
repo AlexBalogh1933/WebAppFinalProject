@@ -1,22 +1,96 @@
-@MinimalApiHost = https://localhost:7196
-
-
-
-
-GET {{MinimalApiHost}}/api/books
+@MinimalAPIHost = https://localhost:7196
 
 ###
+# return all book objects
+GET {{MinimalAPIHost}}/api/books
 
-POST {{MinimalApiHost}}/api/book
+###
+# return all authors objects
+GET {{MinimalAPIHost}}/api/authors
+
+###
+# return all patrons objects
+GET {{MinimalAPIHost}}/api/patrons
+
+###
+# return all publishers objects
+GET {{MinimalAPIHost}}/api/publishers
+
+###
+# return all transactions objects
+GET {{MinimalAPIHost}}/api/transactions
+
+###
+GET {{MinimalAPIHost}}/api/book/1
+
+###
+PUT {{MinimalAPIHost}}/api/book/1
 Content-Type: application/json
 
 {
-  "Title": "alex",
-  "Author": "grave",
-  "Publisher": "john",
-  "Genre": "no"
+  "BookId": 1,
+  "Title": "TestBook2",
+  "Genre": "Horror",
+  "AuthorId": 1,
+  "PublisherId": 1
 }
 
 ###
+POST {{MinimalAPIHost}}/api/book
+Content-Type: application/json
 
+{
+  "Title": "Amoonguss Sweeps",
+  "Genre": "Horror",
+  "AuthorId": 1,
+  "PublisherId": 1
+}
+
+###
+DELETE {{MinimalAPIHost}}/api/book/9
+###
+
+###
+DELETE {{MinimalAPIHost}}/api/patron/3
+###
+
+POST {{MinimalAPIHost}}/api/publisher
+Content-Type: application/json
+
+{
+  "Name": "Houghton Mifflin",
+  "Address": "123 Test St",
+  "EstablishedYear": "1890"
+}
+###
+
+POST {{MinimalAPIHost}}/api/author
+Content-Type: application/json
+
+{
+  "FirstName": "J.K.",
+  "LastName": "Rowling",
+  "Publications": 5
+}
+
+###
+POST {{MinimalAPIHost}}/api/patron
+Content-Type: application/json
+
+{
+  "FirstName": "Howie",
+  "LastName": "Hall",
+  "Address": "123 Getdoxxed St",
+  "PhoneNumber": "1234567890"
+}
+
+###
+POST {{MinimalAPIHost}}/api/transaction
+Content-Type: application/json
+
+{
+  "ReturnDate": "2024-05-23",
+  "PatronId": 1,
+  "BookId": 1
+}
 
