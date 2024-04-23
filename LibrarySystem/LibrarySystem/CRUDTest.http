@@ -89,7 +89,7 @@ POST {{MinimalAPIHost}}/api/transaction
 Content-Type: application/json
 
 {
-  "ReturnDate": "2024-05-23",
+  "ReturnDate": "2024-05-24",
   "PatronId": 1,
   "BookId": 1
 }

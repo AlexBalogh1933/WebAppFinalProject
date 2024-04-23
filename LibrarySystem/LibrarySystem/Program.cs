@@ -396,4 +396,89 @@ app.MapDelete("/api/publisher/{id}", async (LibrarySystemDbContext dbContext, in
     return Results.Ok();
 });
 
+// TRANSACTIONS
+app.MapGet("/api/transactions/", async (LibrarySystemDbContext dbContext) =>
+{
+    var transactions = await dbContext.Transactions.ToListAsync();
+    List<TransactionViewModel> transactionViewModel = new();
+
+    foreach (var transaction in transactions)
+    {
+        transactionViewModel.Add(new TransactionViewModel
+        {
+            TransactionId = transaction.TransactionId,
+            ReturnDate = transaction.ReturnDate,
+            PatronId = transaction.PatronId,
+            BookId = transaction.BookId
+        });
+    }
+    return Results.Ok(transactionViewModel);
+});
+
+app.MapGet("/api/transaction/{id}", async (LibrarySystemDbContext dbContext, int id) =>
+{
+    var transaction = await dbContext.Transactions.FindAsync(id);
+
+    if (transaction == null)
+    {
+        return Results.NotFound();
+    }
+
+    TransactionViewModel transactionViewModel = new()
+    {
+        TransactionId = transaction.TransactionId,
+        ReturnDate = transaction.ReturnDate,
+        PatronId = transaction.PatronId,
+        BookId = transaction.BookId
+    };
+
+    return Results.Ok(transaction);
+});
+
+app.MapPost("/api/transaction/", async (LibrarySystemDbContext dbContext, TransactionViewModel transactionViewModel) =>
+{
+    Transaction transaction = new()
+    {
+        ReturnDate = transactionViewModel.ReturnDate,
+        PatronId = transactionViewModel.PatronId,
+        BookId = transactionViewModel.BookId
+    };
+
+    await dbContext.Transactions.AddAsync(transaction);
+
+    await dbContext.SaveChangesAsync();
+    return Results.Created($"/api/transactions/{transaction.TransactionId}", transaction);
+});
+
+app.MapPut("/api/transaction/{id}", async (LibrarySystemDbContext dbContext, int id, TransactionViewModel transactionViewModel) =>
+{
+    var transaction = await dbContext.Transactions.FindAsync(id);
+
+    if (transaction == null)
+    {
+        return Results.NotFound();
+    }
+
+    transaction.ReturnDate = transactionViewModel.ReturnDate;
+    transaction.PatronId = transactionViewModel.PatronId;
+    transaction.BookId = transactionViewModel.BookId;
+
+    await dbContext.SaveChangesAsync();
+    return Results.Ok(transaction);
+});
+
+app.MapDelete("/api/transaction/{id}", async (LibrarySystemDbContext dbContext, int id) =>
+{
+    var transaction = await dbContext.Transactions.FindAsync(id);
+
+    if (transaction == null)
+    {
+        return Results.NotFound();
+    }
+
+    dbContext.Transactions.Remove(transaction);
+    await dbContext.SaveChangesAsync();
+    return Results.Ok();
+});
+
 app.Run();

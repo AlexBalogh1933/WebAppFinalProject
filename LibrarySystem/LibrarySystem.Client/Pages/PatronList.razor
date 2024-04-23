@@ -23,7 +23,7 @@
 
     <TemplateColumn>
         <FluentButton OnClick="@(()=> navigation.NavigateTo($"/editPatron/{context.PatronId}"))">Edit</FluentButton>
-        <FluentButton OnClick="@(()=> RemoveAuthor(context.PatronId))">Remove</FluentButton>
+        <FluentButton OnClick="@(()=> RemovePatron(context.PatronId))">Remove</FluentButton>
     </TemplateColumn>
 
 
@@ -57,7 +57,7 @@
         {"width", "100"}
     };
 
-    private async Task RemoveAuthor(int authorId)
+    private async Task RemovePatron(int authorId)
     {
         await http.DeleteAsync($"/api/patron/{authorId}");
         patrons = (await http.GetFromJsonAsync<List<PatronViewModel>>("api/patrons")).AsQueryable();
