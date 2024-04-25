@@ -53,8 +53,7 @@ namespace LibrarySystem.Database
                 new Entities.Transaction { TransactionId = 1, DateBorrowed = new DateTime(2024, 3, 28), TotalDaysAllowedToBorrow=10, PatronId=1, BookId=1 },
                 new Entities.Transaction { TransactionId = 2, DateBorrowed = new DateTime(2024, 3, 28), TotalDaysAllowedToBorrow=100, PatronId=2, BookId=2 },
                 new Entities.Transaction { TransactionId = 3, DateBorrowed = new DateTime(2024, 3, 28), TotalDaysAllowedToBorrow = 100, PatronId = 3, BookId = 3 }
-
-                );
+            );
 
             modelBuilder.Entity<Book>()
             .HasMany(e => e.Authors)

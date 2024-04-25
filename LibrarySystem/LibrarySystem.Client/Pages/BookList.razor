@@ -8,12 +8,13 @@
 <FluentCard Width="Auto" Height="Auto">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentCard>
+            <FluentSearch Placeholder="Search Book" @oninput="FindBook" AriaLabel="Search" />
 
-            <FluentTextField Label="Search Book" @oninput="FindBook"></FluentTextField>
             <br />
             <br />
 
-            <FluentSelect Label="Search Parameter Options" ValueChanged="@(e => FilterSearchOption = e)" TOption="string">
+            <FluentSelect ValueChanged="@(e => FilterSearchOption = e)" TOption="string">
+                <FluentOption Value="title">Search Parameter Options</FluentOption>
                 <FluentOption Value="title">Title</FluentOption>
                 <FluentOption Value="genre">Genre</FluentOption>
                 <FluentOption Value="authorFirstName">Author's Firstname</FluentOption>
@@ -23,7 +24,7 @@
             <br />
             <br />
 
-            <FindLikedBookComponent Books="@authorBook" onTop3LikedBooksClick="handleShowLikedBooks" />
+            <FindLikedBookComponent Books="@authorBook" OnTop3LikedBooksClick="handleShowLikedBooks" />
 
             <br />
             <br />
@@ -33,14 +34,21 @@
             <br />
             <br />
 
-            <FluentCheckbox @bind-Value="hideTitleColumn">Hide Titles</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hideGenreColumn">Hide Genres</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hideAuthorFirstNameColumn">Hide Author's Firstname</FluentCheckbox>
-            <br />
+            <FluentAccordionItem Heading="Show Column Filter Options ">
 
-            <FluentCheckbox @bind-Value="hideAuthorLastNameColumn">Hide Author's Lastname</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hideNumberOfDislikes">Hide Author's Firstname</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hideNumberOfLikes">Hide Author's Lastname</FluentCheckbox>
+                <FluentIcon Value="@(new Icons.Regular.Size20.Filter())" Color="@Color.Neutral" Slot="start" />
+                <FluentCheckbox @bind-Value="hideTitleColumn">Hide Titles</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hideGenreColumn">Hide Genres</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hideAuthorFirstNameColumn">Hide Author's Firstname</FluentCheckbox>
+                <br />
+
+                <FluentCheckbox @bind-Value="hideAuthorLastNameColumn">Hide Author's Lastname</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hideNumberOfDislikes">Hide Author's Firstname</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hideNumberOfLikes">Hide Author's Lastname</FluentCheckbox>
+            </FluentAccordionItem>
+
+
+            
 
         </FluentCard>
     </FluentStack>
@@ -92,6 +100,7 @@
     bool hideNumberOfDislikes= false;
 
     string? FilterSearchOption = "title";
+
 
     private async Task FindBook(ChangeEventArgs args)
     {

@@ -1,19 +1,20 @@
 ﻿@using LibrarySystem.Models
 @inject HttpClient http
 
-<FluentButton IconStart="@(new Icons.Regular.Size16.ThumbLike())" OnClick="FindTop3LikedBooks">
+<FluentButton IconStart="@buttonIcon" OnClick="FindTop3LikedBooks">
     @buttonMessage
 </FluentButton>
 
 @code {
     [Parameter]
-    public EventCallback<IQueryable<BookAuthorJoinViewModel>> onTop3LikedBooksClick { get; set; }
+    public EventCallback<IQueryable<BookAuthorJoinViewModel>> OnTop3LikedBooksClick { get; set; }
 
     [Parameter]
     public IQueryable<BookAuthorJoinViewModel>? Books { get; set; }
 
     bool showingLikedBooks = false;
     string buttonMessage = "Show top 3 best rated books";
+    Icon buttonIcon = new Icons.Regular.Size16.ThumbLike();
 
     private async Task FindTop3LikedBooks()
     {
@@ -24,31 +25,33 @@
             var AuthorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks")).AsQueryable();
 
             var allBooks = (from booktb in booksTable
-                          join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
-                          join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
-                          select new BookAuthorJoinViewModel
-                              {
-                                  Book = booktb,
-                                  Author = authortb,
+            join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
+            join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
+            select new BookAuthorJoinViewModel
+            {
+                Book = booktb,
+                Author = authortb,
 
-                              }).AsQueryable();
+            }).AsQueryable();
 
-            await onTop3LikedBooksClick.InvokeAsync(allBooks);
+            await OnTop3LikedBooksClick.InvokeAsync(allBooks);
             showingLikedBooks = false;
             buttonMessage = "Show top 3 best rated books";
+            buttonIcon = new Icons.Regular.Size16.ThumbLike();
         }
         else
         {
             var top3LikedBooks =
             (from book in Books
-             orderby book.Book.NumberOfLikes
+             orderby book.Book.NumberOfLikes descending
              select book).
                 Take(3)
                 .AsQueryable();
-            await onTop3LikedBooksClick.InvokeAsync(top3LikedBooks);
+            await OnTop3LikedBooksClick.InvokeAsync(top3LikedBooks);
             showingLikedBooks = true;
 
             buttonMessage = "Show all Books";
+            buttonIcon = new Icons.Regular.Size16.Clipboard();
 
         }
     }
