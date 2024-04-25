@@ -4,6 +4,7 @@ using LibrarySystem.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibrarySystem.Migrations
 {
     [DbContext(typeof(LibrarySystemDbContext))]
-    partial class LibrarySystemDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240425032624_add bookid to transaction seed")]
+    partial class addbookidtotransactionseed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,26 +190,10 @@ namespace LibrarySystem.Migrations
                         new
                         {
                             PatronId = 1,
-                            Address = "123 Red Street",
+                            Address = "1225 Green Street",
                             FirstName = "David",
                             LastName = "Toran",
                             PhoneNumber = "5137784564"
-                        },
-                        new
-                        {
-                            PatronId = 2,
-                            Address = "456 Orange Street",
-                            FirstName = "Jack",
-                            LastName = "Smith",
-                            PhoneNumber = "5135484456"
-                        },
-                        new
-                        {
-                            PatronId = 3,
-                            Address = "789 Yellow Street",
-                            FirstName = "Purple",
-                            LastName = "Poo",
-                            PhoneNumber = "5135564897"
                         });
                 });
 
@@ -284,22 +271,6 @@ namespace LibrarySystem.Migrations
                             DateBorrowed = new DateTime(2024, 3, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             PatronId = 1,
                             TotalDaysAllowedToBorrow = 10
-                        },
-                        new
-                        {
-                            TransactionId = 2,
-                            BookId = 2,
-                            DateBorrowed = new DateTime(2024, 3, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PatronId = 2,
-                            TotalDaysAllowedToBorrow = 100
-                        },
-                        new
-                        {
-                            TransactionId = 3,
-                            BookId = 3,
-                            DateBorrowed = new DateTime(2024, 3, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            PatronId = 3,
-                            TotalDaysAllowedToBorrow = 100
                         });
                 });
 

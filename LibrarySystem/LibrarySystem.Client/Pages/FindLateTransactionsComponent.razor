@@ -1,0 +1,40 @@
+﻿@using LibrarySystem.Models
+@inject HttpClient http;
+
+<FluentButton IconStart="@(new Icons.Regular.Size16.Hourglass())" OnClick="findNotReturnedBooks">
+    @buttonMessage
+</FluentButton>
+
+@code {
+    [Parameter]
+    public EventCallback<IQueryable<TransactionViewModel>> onFindNotReturnedBooksClick { get; set; }
+
+    [Parameter]
+    public IQueryable<TransactionViewModel> Transactions { get; set; }
+
+    bool isShowingLateTransaction = false;
+    string buttonMessage = "Show Late Transactions";
+
+    private async void findNotReturnedBooks()
+    {
+        if (!isShowingLateTransaction)
+        {
+            var lateReturns =
+            (from transaction in Transactions
+             where (int)(DateTime.Now - transaction.DateBorrowed).Value.Days > transaction.TotalDaysAllowedToBorrow
+             select transaction).AsQueryable();
+            onFindNotReturnedBooksClick.InvokeAsync(lateReturns);
+            isShowingLateTransaction = true;
+            buttonMessage = "Show All Transactions";
+        }
+        else
+        {
+            var allTransactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
+            onFindNotReturnedBooksClick.InvokeAsync(allTransactions);
+
+            isShowingLateTransaction = false;
+            buttonMessage = "Show Late Transactions";
+        }
+
+    }
+}

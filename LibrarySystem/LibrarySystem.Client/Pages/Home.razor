@@ -1,8 +1,62 @@
 ﻿@page "/"
 @using LibrarySystem.Client.LoggingFeature;
+@inject IToastService ToastService
+
 <PageTitle>Home</PageTitle>
 
-<h1>Welcome to the Library System</h1>
+<h1>Welcome to the Library System</h1> 
+<h4>Once you join, you'll never want to leave!</h4>
+<hr />
+
+<h3 style="text-decoration:underline">Why Join Us?</h3>
+<p>Order and structure are the most important aspects of life.</p> 
+<p>The system will make sure your life is perfect!</p>
+
+<h3 style="text-decoration:underline">Owners</h3>
+<h4>Howie | David | Alex</h4>
+
+<br />
+
+<h3 style="text-decoration:underline">Notable Employees</h3>
+<br />
+
+<h4>Jonathan</h4>
+<img src="images/jonathan.png" />
+
+<p>
+    Jonathan is a notable employee. He has read many books and have completed all his tasks
+    <br />
+    He is a very good boy!
+</p>
+
+<h4>Jane</h4>
+
+<img src="images/Jane.png" />
+
+<p>Jane is a notable employee. She has read many books and have completed all her tasks 
+    <br />
+    She is a very good girl!
+</p>
+
+<DedicationScaleComponent onDedicationValueSubmit="handleDedicationSubmission" />
+
 @code{
     public PageLogging pageLogging;
+    string imageSource = "images/jonathan.png";
+
+    private void handleDedicationSubmission(int value)
+    {
+        if(value <= 50)
+        {
+            ToastService.ShowWarning("Go away");
+
+        }
+        else
+        {
+            ToastService.ShowSuccess("Yay!!!");
+
+        }
+        StateHasChanged();
+    }
+
 }

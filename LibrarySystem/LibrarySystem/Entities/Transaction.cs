@@ -7,13 +7,12 @@ namespace LibrarySystem.Entities
     public class Transaction
     {
         public int TransactionId { get; set; }
-        public DateTime? ReturnDate { get; set; }
-        [ForeignKey("PatronId")]
-        public int PatronId { get; set; }
+        public DateTime? ReturnDate { get; set; } = null;
+        public DateTime? DateBorrowed { get; set; }
+        public int TotalDaysAllowedToBorrow { get; set; }
+        public int? PatronId { get; set; } = null;
         public virtual Patron? Patron { get; set; }
-        [ForeignKey("BookId")]
-        public int BookId { get; set; }
-        public virtual Book? Book { get; set; }
-
+        public int? BookId { get; set; } = null;
+        public Book? Book { get; set; } = null;
     }
 }

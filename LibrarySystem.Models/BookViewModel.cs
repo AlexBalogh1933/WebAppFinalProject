@@ -12,10 +12,14 @@ namespace LibrarySystem.Models
         public int BookId { get; set; }
         public string Title { get; set; }
         public string Genre { get; set; }
-        [ForeignKey("AuthorId")]
-        public int AuthorId { get; set; }
-        [ForeignKey("PublisherId")]
+        public int NumberOfLikes { get; set; } = 0;
+        public int NumberOfDislikes { get; set; } = 0;
+
+
         public int PublisherId { get; set; }
+        public virtual PublisherViewModel? Publisher { get; set; }
+
+        public virtual ICollection<AuthorViewModel>? Authors { get; set; }
 
     }
 }

@@ -29,7 +29,6 @@
 
             <FluentCheckbox @bind-Value="hideFirstColumn">Hide First Name</FluentCheckbox>
             <FluentCheckbox @bind-Value="hideLastColumn">Hide Last Name</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hidePublicationsColumn">Hide Publications</FluentCheckbox>
 
         </FluentCard>
     </FluentStack>
@@ -47,13 +46,9 @@
     {
         <PropertyColumn Property="@(b => b.LastName)" Sortable="true" />
     }
-    @if (!hidePublicationsColumn)
-    {
-        <PropertyColumn Property="@(b => b.Publications)" Sortable="true" />
-    }
 
     <TemplateColumn>
-        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.AuthorId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/authorDetails/{context.AuthorId}"))">Edit</FluentButton>
         <FluentButton OnClick="@(()=> RemoveAuthor(context.AuthorId))">Remove</FluentButton>
     </TemplateColumn>
 
@@ -66,7 +61,6 @@
 
     bool hideFirstColumn = false;
     bool hideLastColumn = false;
-    bool hidePublicationsColumn = false;
 
     string? FilterSearchOption = "author";
 
@@ -90,11 +84,6 @@
             {
                 authors = authors.Where(b => b.LastName.ToLower().StartsWith(input)).AsQueryable();
             }
-            // else if (FilterSearchOption == "publications")
-            // {
-            //     authors = authors.Where(b => b.Publications.ToLower().StartsWith(input)).AsQueryable();
-            // }
-            
         }
     }
 

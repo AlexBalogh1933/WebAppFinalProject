@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibrarySystem.Migrations
 {
     [DbContext(typeof(LibrarySystemDbContext))]
-    [Migration("20240423005438_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240425032144_add transaction seed")]
+    partial class addtransactionseed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,17 +34,12 @@ namespace LibrarySystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuthorId"));
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("Publications")
+                    b.Property<string>("LastName")
                         .HasMaxLength(50)
-                        .HasColumnType("int");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("AuthorId");
 
@@ -55,8 +50,44 @@ namespace LibrarySystem.Migrations
                         {
                             AuthorId = 1,
                             FirstName = "Dr.",
-                            LastName = "Suess",
-                            Publications = 3
+                            LastName = "Seuss"
+                        });
+                });
+
+            modelBuilder.Entity("LibrarySystem.Entities.AuthorBook", b =>
+                {
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AuthorId", "BookId");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("AuthorBooks");
+
+                    b.HasData(
+                        new
+                        {
+                            AuthorId = 1,
+                            BookId = 1
+                        },
+                        new
+                        {
+                            AuthorId = 1,
+                            BookId = 2
+                        },
+                        new
+                        {
+                            AuthorId = 1,
+                            BookId = 3
+                        },
+                        new
+                        {
+                            AuthorId = 1,
+                            BookId = 4
                         });
                 });
 
@@ -68,23 +99,22 @@ namespace LibrarySystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookId"));
 
-                    b.Property<int>("AuthorId")
+                    b.Property<string>("Genre")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfDislikes")
                         .HasColumnType("int");
 
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NumberOfLikes")
+                        .HasColumnType("int");
 
                     b.Property<int>("PublisherId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BookId");
-
-                    b.HasIndex("AuthorId");
 
                     b.HasIndex("PublisherId");
 
@@ -94,10 +124,38 @@ namespace LibrarySystem.Migrations
                         new
                         {
                             BookId = 1,
-                            AuthorId = 1,
-                            Genre = "Comedy",
+                            Genre = "Children's Literature",
+                            NumberOfDislikes = 10,
+                            NumberOfLikes = 5,
                             PublisherId = 1,
                             Title = "Cat in the hat"
+                        },
+                        new
+                        {
+                            BookId = 2,
+                            Genre = "Children's Literature",
+                            NumberOfDislikes = 100,
+                            NumberOfLikes = 10,
+                            PublisherId = 1,
+                            Title = "Green eggs and ham"
+                        },
+                        new
+                        {
+                            BookId = 3,
+                            Genre = "Children's Literature",
+                            NumberOfDislikes = 50,
+                            NumberOfLikes = 15,
+                            PublisherId = 1,
+                            Title = "The lorax"
+                        },
+                        new
+                        {
+                            BookId = 4,
+                            Genre = "Children's Literature",
+                            NumberOfDislikes = 5,
+                            NumberOfLikes = 20,
+                            PublisherId = 1,
+                            Title = "Fox in socks"
                         });
                 });
 
@@ -110,21 +168,17 @@ namespace LibrarySystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PatronId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
@@ -152,17 +206,15 @@ namespace LibrarySystem.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PublisherId"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("EstablishedYear")
-                        .HasMaxLength(50)
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("PublisherId");
 
@@ -186,39 +238,62 @@ namespace LibrarySystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"));
 
-                    b.Property<int>("BookId")
+                    b.Property<int?>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<int>("PatronId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ReturnDate")
+                    b.Property<DateTime?>("DateBorrowed")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("PatronId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TotalDaysAllowedToBorrow")
+                        .HasColumnType("int");
 
                     b.HasKey("TransactionId");
 
-                    b.HasIndex("BookId");
+                    b.HasIndex("BookId")
+                        .IsUnique()
+                        .HasFilter("[BookId] IS NOT NULL");
 
                     b.HasIndex("PatronId");
 
                     b.ToTable("Transactions");
+
+                    b.HasData(
+                        new
+                        {
+                            TransactionId = 1,
+                            DateBorrowed = new DateTime(2024, 3, 28, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            TotalDaysAllowedToBorrow = 10
+                        });
                 });
 
-            modelBuilder.Entity("LibrarySystem.Entities.Book", b =>
+            modelBuilder.Entity("LibrarySystem.Entities.AuthorBook", b =>
                 {
-                    b.HasOne("LibrarySystem.Entities.Author", "Author")
+                    b.HasOne("LibrarySystem.Entities.Author", null)
                         .WithMany()
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LibrarySystem.Entities.Publisher", "Publisher")
+                    b.HasOne("LibrarySystem.Entities.Book", null)
                         .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LibrarySystem.Entities.Book", b =>
+                {
+                    b.HasOne("LibrarySystem.Entities.Publisher", "Publisher")
+                        .WithMany("Books")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Author");
 
                     b.Navigation("Publisher");
                 });
@@ -226,20 +301,31 @@ namespace LibrarySystem.Migrations
             modelBuilder.Entity("LibrarySystem.Entities.Transaction", b =>
                 {
                     b.HasOne("LibrarySystem.Entities.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("Transaction")
+                        .HasForeignKey("LibrarySystem.Entities.Transaction", "BookId");
 
                     b.HasOne("LibrarySystem.Entities.Patron", "Patron")
-                        .WithMany()
-                        .HasForeignKey("PatronId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Patrons")
+                        .HasForeignKey("PatronId");
 
                     b.Navigation("Book");
 
                     b.Navigation("Patron");
+                });
+
+            modelBuilder.Entity("LibrarySystem.Entities.Book", b =>
+                {
+                    b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("LibrarySystem.Entities.Patron", b =>
+                {
+                    b.Navigation("Patrons");
+                });
+
+            modelBuilder.Entity("LibrarySystem.Entities.Publisher", b =>
+                {
+                    b.Navigation("Books");
                 });
 #pragma warning restore 612, 618
         }

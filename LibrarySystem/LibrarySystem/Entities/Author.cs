@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LibrarySystem.Controllers;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LibrarySystem.Entities
@@ -7,10 +8,10 @@ namespace LibrarySystem.Entities
     public class Author
     {
         public int AuthorId { get; set; }
-        public string FirstName { get; set; }
         [MaxLength(50)]
-        public string LastName { get; set; }
+        public string? FirstName { get; set; }
         [MaxLength(50)]
-        public int Publications { get; set; }
+        public string? LastName { get; set; }
+        public virtual ICollection<Book>? Books { get; set; }
     }
 }

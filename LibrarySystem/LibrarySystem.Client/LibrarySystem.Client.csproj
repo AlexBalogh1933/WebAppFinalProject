@@ -18,4 +18,8 @@
     <ProjectReference Include="..\..\LibrarySystem.Models\LibrarySystem.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\images\jonathan.PNG" />
+  </ItemGroup>
+
 </Project>

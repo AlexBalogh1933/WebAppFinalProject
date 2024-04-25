@@ -78,7 +78,7 @@ namespace LibrarySystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Author>> PostAuthor(Author author)
         {
-            _context.Author.Add(author);
+            _context.Authors.Add(author);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAuthor", new { id = author.AuthorId }, author);
@@ -93,8 +93,7 @@ namespace LibrarySystem.Controllers
             {
                 return NotFound();
             }
-
-            _context.Author.Remove(author);
+            _context.Authors.Remove(author);
             await _context.SaveChangesAsync();
 
             return NoContent();

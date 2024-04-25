@@ -8,24 +8,24 @@
 <EditForm Model="@book" OnValidSubmit="HandleValidSubmit" FormName="BookForm">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentTextField @bind-Value="book.Title" Label="Title"></FluentTextField>
-        <FluentNumberField @bind-Value="book.AuthorId" Label="Author"></FluentNumberField>
         <FluentTextField @bind-Value="book.Genre" Label="Genre"></FluentTextField>
         <FluentNumberField @bind-Value="book.PublisherId" Label="Publisher"></FluentNumberField>
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentButton Type="ButtonType.Submit">Save</FluentButton>
             <FluentButton OnClick="@(()=> navigation.NavigateTo("/bookList"))">Cancel</FluentButton>
-
         </FluentStack>
-
     </FluentStack>
 </EditForm>
+
+
+
 @code {
     [SupplyParameterFromForm]
     public BookViewModel book { get; set; } = new();
 
     private async Task HandleValidSubmit()
     {
-        await http.PostAsJsonAsync($"/api/book/", book);
+        await http.PostAsJsonAsync("/api/book/", book);
         navigation.NavigateTo("/bookList");
     }
 }

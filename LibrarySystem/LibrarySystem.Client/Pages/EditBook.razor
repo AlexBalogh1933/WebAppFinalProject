@@ -11,7 +11,6 @@
         <FluentTextField @bind-Value="book.Title" Label="Title"></FluentTextField>
         <FluentTextField @bind-Value="book.Genre" Label="Genre"></FluentTextField>
         <FluentNumberField @bind-Value="book.PublisherId" Label="Publisher"></FluentNumberField>
-        <FluentNumberField @bind-Value="book.AuthorId" Label="Author"></FluentNumberField>
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentButton Type="ButtonType.Submit">Save</FluentButton>
             <FluentButton OnClick="@(()=> navigation.NavigateTo("/bookList"))">Cancel</FluentButton>
@@ -19,9 +18,12 @@
 
     </FluentStack>
 </EditForm>
-@code {
+
+
+ @code {
     [Parameter]
     public int bookId { get; set; }
+
     [SupplyParameterFromForm]
     public BookViewModel book { get; set; } = new();
 

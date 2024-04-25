@@ -12,9 +12,8 @@ namespace LibrarySystem.Models
     {
         public int TransactionId { get; set; }
         public DateTime? ReturnDate { get; set; }
-        [ForeignKey("PatronId")]
-        public int PatronId { get; set; }
-        [ForeignKey("BookId")]
-        public int BookId { get; set; }
+        public DateTime? DateBorrowed { get; set; }
+        public int TotalDaysAllowedToBorrow { get; set; }
+        public virtual ICollection<PatronViewModel>? Patrons { get; set; }
     }
 }

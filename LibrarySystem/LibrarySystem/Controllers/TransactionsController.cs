@@ -25,14 +25,14 @@ namespace LibrarySystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
-            return await _context.Transaction.ToListAsync();
+            return await _context.Transactions.ToListAsync();
         }
 
         // GET: api/Transactions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Transaction>> GetTransaction(int id)
         {
-            var transaction = await _context.Transaction.FindAsync(id);
+            var transaction = await _context.Transactions.FindAsync(id);
 
             if (transaction == null)
             {
@@ -78,7 +78,7 @@ namespace LibrarySystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
-            _context.Transaction.Add(transaction);
+            _context.Transactions.Add(transaction);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetTransaction", new { id = transaction.TransactionId }, transaction);
@@ -88,13 +88,13 @@ namespace LibrarySystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
-            var transaction = await _context.Transaction.FindAsync(id);
+            var transaction = await _context.Transactions.FindAsync(id);
             if (transaction == null)
             {
                 return NotFound();
             }
 
-            _context.Transaction.Remove(transaction);
+            _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +102,7 @@ namespace LibrarySystem.Controllers
 
         private bool TransactionExists(int id)
         {
-            return _context.Transaction.Any(e => e.TransactionId == id);
+            return _context.Transactions.Any(e => e.TransactionId == id);
         }
     }
 }

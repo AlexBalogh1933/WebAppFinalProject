@@ -8,16 +8,20 @@
 <EditForm Model="@transaction" OnValidSubmit="HandleValidSubmit" FormName="TransactionForm">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentDatePicker @bind-Value="transaction.ReturnDate" Label="Return Date"></FluentDatePicker>
-        <FluentNumberField @bind-Value="transaction.PatronId" Label="Patron Id"></FluentNumberField>
-        <FluentNumberField @bind-Value="transaction.BookId" Label="Book Id"></FluentNumberField>
+        <FluentNumberField @bind-Value="transaction.TotalDaysAllowedToBorrow" Label="Total Days Allowed To Borrow"></FluentNumberField>
+        <FluentDatePicker @bind-Value="transaction.DateBorrowed" Label="Date Borrowed"></FluentDatePicker>
+
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentButton Type="ButtonType.Submit">Save</FluentButton>
             <FluentButton OnClick="@(()=> navigation.NavigateTo("/transactionList"))">Cancel</FluentButton>
 
         </FluentStack>
 
+
+
     </FluentStack>
 </EditForm>
+
 @code {
     [SupplyParameterFromForm]
     public TransactionViewModel transaction { get; set; } = new();

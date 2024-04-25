@@ -10,7 +10,6 @@
         <FluentNumberField @bind-Value="author.AuthorId" Label="authorId" TValue="int" ReadOnly></FluentNumberField>
         <FluentTextField @bind-Value="author.FirstName" Label="First Name"></FluentTextField>
         <FluentTextField @bind-Value="author.LastName" Label="Last Name"></FluentTextField>
-        <FluentNumberField @bind-Value="author.Publications" Label="Publication"></FluentNumberField>
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentButton Type="ButtonType.Submit">Save</FluentButton>
             <FluentButton OnClick="@(()=> navigation.NavigateTo("/authorList"))">Cancel</FluentButton>

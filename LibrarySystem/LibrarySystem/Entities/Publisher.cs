@@ -7,10 +7,11 @@ namespace LibrarySystem.Entities
     public class Publisher
     {
         public int PublisherId { get; set; }
-        public string Name { get; set; }
         [MaxLength(50)]
-        public string Address { get; set; }
+        public string? Name { get; set; }
         [MaxLength(50)]
+        public string? Address { get; set; }
         public int EstablishedYear { get; set; }
+        public virtual ICollection<Book>? Books { get; set; }
     }
 }

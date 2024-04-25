@@ -5,7 +5,7 @@
 
 <h3>Current Books</h3>
 
-<FluentCard Width="Auto" Height="350px">
+<FluentCard Width="Auto" Height="Auto">
     <FluentStack Orientation="Orientation.Vertical">
         <FluentCard>
 
@@ -14,11 +14,16 @@
             <br />
 
             <FluentSelect Label="Search Parameter Options" ValueChanged="@(e => FilterSearchOption = e)" TOption="string">
-                <FluentOption Value="author">Author</FluentOption>
                 <FluentOption Value="title">Title</FluentOption>
                 <FluentOption Value="genre">Genre</FluentOption>
-                <FluentOption Value="publisher">Publisher</FluentOption>
+                <FluentOption Value="authorFirstName">Author's Firstname</FluentOption>
+                <FluentOption Value="authorLastName">Author's Lastname</FluentOption>
             </FluentSelect>
+
+            <br />
+            <br />
+
+            <FindLikedBookComponent Books="@authorBook" onTop3LikedBooksClick="handleShowLikedBooks" />
 
             <br />
             <br />
@@ -29,95 +34,127 @@
             <br />
 
             <FluentCheckbox @bind-Value="hideTitleColumn">Hide Titles</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hideAuthorIdColumn">Hide Authors</FluentCheckbox>
-            <FluentCheckbox @bind-Value="hidePublisherIdColumn">Hide Publishers</FluentCheckbox>
             <FluentCheckbox @bind-Value="hideGenreColumn">Hide Genres</FluentCheckbox>
-            
+            <FluentCheckbox @bind-Value="hideAuthorFirstNameColumn">Hide Author's Firstname</FluentCheckbox>
+            <br />
+
+            <FluentCheckbox @bind-Value="hideAuthorLastNameColumn">Hide Author's Lastname</FluentCheckbox>
+            <FluentCheckbox @bind-Value="hideNumberOfDislikes">Hide Author's Firstname</FluentCheckbox>
+            <FluentCheckbox @bind-Value="hideNumberOfLikes">Hide Author's Lastname</FluentCheckbox>
+
         </FluentCard>
     </FluentStack>
 </FluentCard>
 
-<FluentDataGrid Items="@books">
-
-    <PropertyColumn Property="@(b => b.BookId)" Sortable="true" />
+<FluentDataGrid  Items="@authorBook">
 
     @if (!hideTitleColumn)
     {
-        <PropertyColumn Property="@(b => b.Title)" Sortable="true" />
-    }
-    @if (!hideAuthorIdColumn)
-    {
-        <PropertyColumn Property="@(b => b.AuthorId)" Sortable="true" />
-    }
-    @if (!hidePublisherIdColumn)
-    {
-        <PropertyColumn Property="@(b => b.PublisherId)" Sortable="true" />
+        <PropertyColumn Property="@(b => b.Book.Title)" Sortable="true" />
     }
     @if (!hideGenreColumn)
     {
-        <PropertyColumn Property="@(b => b.Genre)" Sortable="true" />
+        <PropertyColumn Property="@(b => b.Book.Genre)" Sortable="true" />
     }
-
+    @if (!hideNumberOfDislikes)
+    {
+        <PropertyColumn Title="Total Dislikes" Property="@(b =>  b.Book.NumberOfDislikes)" Sortable="true" />
+    }
+    @if (!hideNumberOfLikes)
+    {
+        <PropertyColumn Title="Total Likes" Property="@(b =>  b.Book.NumberOfLikes)" Sortable="true" />
+    }
+    @if (!hideAuthorFirstNameColumn)
+    {
+        <PropertyColumn Title="Author's First Name" Property="@(b => b.Author.FirstName)" Sortable="true" />
+    }
+    @if (!hideAuthorLastNameColumn)
+    {
+        <PropertyColumn Title="Author's Last Name" Property="@(b =>  b.Author.LastName)" Sortable="true" />
+    }
     <TemplateColumn>
-        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.BookId}"))">Edit</FluentButton>
-        <FluentButton OnClick="@(()=> RemoveBook(context.BookId))">Remove</FluentButton>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.Book.BookId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> RemoveBook(context.Book))">Remove</FluentButton>
     </TemplateColumn>
 
 </FluentDataGrid>
 
 @code {
-    public IQueryable<BookViewModel> books { get; set; }
+    IQueryable<BookAuthorJoinViewModel> authorBook { get; set; }
 
     private bool displayBook = true;
 
     bool hideTitleColumn = false;
     bool hideGenreColumn = false;
-    bool hidePublisherIdColumn = false;
-    bool hideAuthorIdColumn = false;
+    bool hideAuthorFirstNameColumn = false;
+    bool hideAuthorLastNameColumn = false;
+    bool hideNumberOfLikes = false;
+    bool hideNumberOfDislikes= false;
 
-    string? FilterSearchOption = "author";
+    string? FilterSearchOption = "title";
 
     private async Task FindBook(ChangeEventArgs args)
     {
         var input = args.Value.ToString();
 
+        var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+        var AuthorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors")).AsQueryable();
+        var AuthorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks")).AsQueryable();
 
-        if (string.IsNullOrWhiteSpace(input))
+        authorBook = 
+            (from booktb in booksTable
+            join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
+            join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
+            select new BookAuthorJoinViewModel
+            {
+                Book = booktb,
+                Author = authortb,
+
+            }).AsQueryable();
+
+        if (FilterSearchOption == "title")
         {
-            books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+            authorBook = authorBook.Where(b => b.Book.Title.ToLower().StartsWith(input)).AsQueryable();
         }
-        else
+        else if (FilterSearchOption == "genre")
         {
-            books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
-
-            // if (FilterSearchOption == "author")
-            // {
-            //     books = books.Where(b => b.Author.ToLower().StartsWith(input)).AsQueryable();
-            // }
-            if (FilterSearchOption == "title")
-            {
-                books = books.Where(b => b.Title.ToLower().StartsWith(input)).AsQueryable();
-            }
-            // else if (FilterSearchOption == "publisher")
-            // {
-            //     books = books.Where(b => b.Publisher.ToLower().StartsWith(input)).AsQueryable();
-            // }
-            else if (FilterSearchOption == "genre")
-            {
-                books = books.Where(b => b.Genre.ToLower().StartsWith(input)).AsQueryable();
-
-            }
+            authorBook = authorBook.Where(b => b.Book.Genre.ToLower().StartsWith(input)).AsQueryable();
+        }
+        else if (FilterSearchOption == "authorFirstName")
+        {
+            authorBook = authorBook.Where(b => b.Author.FirstName.ToLower().StartsWith(input)).AsQueryable();
+        }
+        else if (FilterSearchOption == "authorLastName")
+        {
+            authorBook = authorBook.Where(b => b.Author.LastName.ToLower().StartsWith(input)).AsQueryable();
         }
     }
-
     protected override async Task OnParametersSetAsync()
     {
-        books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+        var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+        var AuthorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors")).AsQueryable();
+        var AuthorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks")).AsQueryable();
+
+        authorBook = (from booktb in booksTable
+        join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
+        join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
+        select new BookAuthorJoinViewModel
+        {
+            Book = booktb,
+            Author = authortb,
+
+        }).AsQueryable();
     }
 
-    private async Task RemoveBook(int bookId)
+    private async Task RemoveBook(BookViewModel book)
     {
-        await http.DeleteAsync($"/api/book/{bookId}");
-        books = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
+        await http.DeleteAsync($"/api/book/{book.BookId}");
     }
+
+    private void handleShowLikedBooks(IQueryable<BookAuthorJoinViewModel> top3LikedBooks)
+    {
+        authorBook = top3LikedBooks;
+        StateHasChanged();
+    }
+
 }

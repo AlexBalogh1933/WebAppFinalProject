@@ -1,6 +1,7 @@
 ﻿using LibrarySystem.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection.Metadata;
 
 namespace LibrarySystem.Entities
 {
@@ -8,13 +9,17 @@ namespace LibrarySystem.Entities
     public class Book
     {
         public int BookId { get; set; }
-        public string Title { get; set; }
-        public string Genre { get; set; }
-        [ForeignKey("AuthorId")]
-        public int AuthorId { get; set; }
-        public virtual Author? Author { get; set; } = null;
-        [ForeignKey("PublisherId")]
+        public string? Title { get; set; }
+        public string? Genre { get; set; }
+        public int NumberOfLikes { get; set; } = 0;
+        public int NumberOfDislikes { get; set; } = 0;
+
         public int PublisherId { get; set; }
-        public virtual Publisher? Publisher { get; set; } = null;
+        public virtual Publisher? Publisher { get; set; }
+
+        public virtual Transaction? Transaction { get; set; }
+
+        public virtual ICollection<Author>? Authors { get; set; }
+
     }
 }

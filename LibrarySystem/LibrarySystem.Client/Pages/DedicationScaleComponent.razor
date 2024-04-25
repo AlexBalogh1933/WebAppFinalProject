@@ -1,0 +1,32 @@
+﻿<h4>How dedicated are you to the system?</h4>
+
+
+<div style="display: flex; flex-direction: column; height: min-content;">
+    <FluentSlider Min="0" Max="100" Step="10" @bind-Value=dedicationValue>
+        <FluentSliderLabel Position="0">Not at all</FluentSliderLabel>
+        <FluentSliderLabel Position="50">Not Sure</FluentSliderLabel>
+        <FluentSliderLabel Position="100">Very badly</FluentSliderLabel>
+    </FluentSlider>
+
+    
+</div>
+
+<br />
+<FluentButton IconStart="@(new Icons.Regular.Size16.Shield())" OnClick="submitDedication">
+    Submit Score
+</FluentButton>
+
+
+@code {
+    int dedicationValue = 0;
+
+    [Parameter]
+    public EventCallback<int> onDedicationValueSubmit { get; set; }
+
+    private void submitDedication()
+    {
+        onDedicationValueSubmit.InvokeAsync(dedicationValue);
+
+    }
+
+}

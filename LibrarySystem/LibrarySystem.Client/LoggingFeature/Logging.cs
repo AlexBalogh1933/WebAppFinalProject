@@ -8,7 +8,6 @@
         {
             _logger = logger;
         }
-
         public void WriteMessage(string message)
         {
             _logger.LogInformation($"Logging.WriteMessage Message: {message}");
