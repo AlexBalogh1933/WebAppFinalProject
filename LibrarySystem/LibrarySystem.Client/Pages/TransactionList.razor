@@ -6,7 +6,7 @@
 <h3>List of Transactions</h3>
 <FluentStack Orientation="Orientation.Horizontal">
     <FluentCard>
-        <FindLateTransactionsComponent Transactions="@Transactions" onFindNotReturnedBooksClick="handleShowLateBooks" />
+        <FindLateTransactionsComponent Transactions="@Transactions" OnFindNotReturnedBooksClick="handleShowLateBooks" />
         <br />
         <br />
 
@@ -16,9 +16,8 @@
 </FluentStack>
 
 <FluentDataGrid Items="@Transactions">
-
     <PropertyColumn Property="@(b => b.TransactionId)" Sortable="true" />
-    <PropertyColumn Title="Date Returned" Property="@(b => b.ReturnDate)" Sortable="true" />
+    <PropertyColumn Title="Date Returned" Property="@(b => (b.ReturnDate == null ? "Not Returned" : b.ReturnDate.ToString()))" Sortable="true" />
     <PropertyColumn Title="Date Borrowed" Property="@(b => b.DateBorrowed)" Sortable="true" />
     <PropertyColumn Title="Days Allowed To Borrow Book" Property="@(b => b.TotalDaysAllowedToBorrow)" Sortable="true" />
 
@@ -29,17 +28,17 @@
 </FluentDataGrid>
 
 @code {
-    public IQueryable<TransactionViewModel> Transactions { get; set; }
+    public IQueryable<TransactionViewModel>? Transactions { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        Transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
+        Transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions"))?.AsQueryable();
     }
 
-    private async Task RemoveTransaction(int transactionId)
+    private async Task RemoveTransaction(int id)
     {
-        await http.DeleteAsync($"/api/transaction/{transactionId}");
-        Transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
+        await http.DeleteAsync($"/api/transaction/{id}");
+        Transactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions"))?.AsQueryable();
     }
 
     private void handleShowLateBooks(IQueryable<TransactionViewModel> transactionViewModels)

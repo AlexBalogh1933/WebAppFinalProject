@@ -5,11 +5,19 @@
 
 <h3>New Book Form</h3>
 
-<EditForm Model="@book" OnValidSubmit="HandleValidSubmit" FormName="BookForm">
+<EditForm Model="@BookQuery" OnValidSubmit="HandleValidSubmit" FormName="BookForm">
     <FluentStack Orientation="Orientation.Vertical">
-        <FluentTextField @bind-Value="book.Title" Label="Title"></FluentTextField>
-        <FluentTextField @bind-Value="book.Genre" Label="Genre"></FluentTextField>
-        <FluentNumberField @bind-Value="book.PublisherId" Label="Publisher"></FluentNumberField>
+
+        <FluentTextField @bind-Value="BookQuery.Item2.Title" Label="Book Title"></FluentTextField>
+        <FluentTextField @bind-Value="BookQuery.Item2.Genre" Label="Book Genre"></FluentTextField>
+
+        <FluentTextField @bind-Value="BookQuery.Item1.FirstName" Label="Author's First Name"></FluentTextField>
+        <FluentTextField @bind-Value="BookQuery.Item1.LastName" Label="Author's Last Name"></FluentTextField>
+
+        <FluentTextField @bind-Value="BookQuery.Item3.Name" Label="Publisher's Name"></FluentTextField>
+        <FluentTextField @bind-Value="BookQuery.Item3.Address" Label="Publisher's Address"></FluentTextField>
+        <FluentNumberField @bind-Value="BookQuery.Item3.EstablishedYear" Label="Date Published"></FluentNumberField>
+
         <FluentStack Orientation="Orientation.Horizontal">
             <FluentButton Type="ButtonType.Submit">Save</FluentButton>
             <FluentButton OnClick="@(()=> navigation.NavigateTo("/bookList"))">Cancel</FluentButton>
@@ -17,15 +25,33 @@
     </FluentStack>
 </EditForm>
 
-
-
 @code {
     [SupplyParameterFromForm]
-    public BookViewModel book { get; set; } = new();
+    Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>? BookQuery { get; set; } = new Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>(new AuthorViewModel(), new BookViewModel(), new PublisherViewModel());
 
     private async Task HandleValidSubmit()
     {
-        await http.PostAsJsonAsync("/api/book/", book);
+        AuthorViewModel authorViewModel = BookQuery.Item1;
+        BookViewModel bookViewModel = BookQuery.Item2;
+        PublisherViewModel publisherViewModel = BookQuery.Item3;
+
+
+        await http.PostAsJsonAsync("/api/publisher/", publisherViewModel);
+        bookViewModel.PublisherId = (await http.GetFromJsonAsync<List<PublisherViewModel>>("api/publishers")).AsQueryable().Last().PublisherId;
+
+        await http.PostAsJsonAsync("/api/book/", bookViewModel);
+        await http.PostAsJsonAsync("/api/author/", authorViewModel);
+
+        var bookId = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable().Last().BookId;
+        var authorId = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors")).AsQueryable().Last().AuthorId;
+
+        AuthorBookViewModel e = new();
+        e.BookId = bookId;
+        e.AuthorId = authorId;
+
+        await http.PostAsJsonAsync("/api/authorbook/", e);
+
+
         navigation.NavigateTo("/bookList");
     }
 }

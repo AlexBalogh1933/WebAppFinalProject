@@ -25,7 +25,6 @@ namespace LibrarySystem.DAO
                         NumberOfDislikes = book.NumberOfDislikes,
                         NumberOfLikes = book.NumberOfLikes
                     });
-
                 }
                 return Results.Ok(bookViewModel);
             });

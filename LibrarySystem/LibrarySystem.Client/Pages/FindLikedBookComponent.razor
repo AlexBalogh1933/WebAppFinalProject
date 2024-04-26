@@ -7,10 +7,10 @@
 
 @code {
     [Parameter]
-    public EventCallback<IQueryable<BookAuthorJoinViewModel>> OnTop3LikedBooksClick { get; set; }
+    public EventCallback<IQueryable<Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>>> OnTop3LikedBooksClick { get; set; }
 
     [Parameter]
-    public IQueryable<BookAuthorJoinViewModel>? Books { get; set; }
+    public IQueryable<Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>>? BookQuery { get; set; }
 
     bool showingLikedBooks = false;
     string buttonMessage = "Show top 3 best rated books";
@@ -20,21 +20,19 @@
     {
         if (showingLikedBooks)
         {
-            var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
-            var AuthorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors")).AsQueryable();
-            var AuthorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks")).AsQueryable();
+            var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books"))?.AsQueryable();
+            var authorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors"))?.AsQueryable();
+            var authorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks"))?.AsQueryable();
+            var publisherTable = (await http.GetFromJsonAsync<List<PublisherViewModel>>("api/publishers"))?.AsQueryable();
 
-            var allBooks = (from booktb in booksTable
-            join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
-            join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
-            select new BookAuthorJoinViewModel
-            {
-                Book = booktb,
-                Author = authortb,
+            BookQuery = (from book in booksTable
+                         join authorbook in authorBookTable on book.BookId equals authorbook.BookId
+                         join author in authorTable on authorbook.AuthorId equals author.AuthorId
+                         join publisher in publisherTable on book.PublisherId equals publisher.PublisherId
+                         select new Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>(author, book, publisher)).AsQueryable();
 
-            }).AsQueryable();
 
-            await OnTop3LikedBooksClick.InvokeAsync(allBooks);
+            await OnTop3LikedBooksClick.InvokeAsync(BookQuery);
             showingLikedBooks = false;
             buttonMessage = "Show top 3 best rated books";
             buttonIcon = new Icons.Regular.Size16.ThumbLike();
@@ -42,14 +40,14 @@
         else
         {
             var top3LikedBooks =
-            (from book in Books
-             orderby book.Book.NumberOfLikes descending
-             select book).
-                Take(3)
-                .AsQueryable();
+            (from book in BookQuery
+             orderby book.Item2.NumberOfLikes descending
+             select book)
+             .Take(3)
+              .AsQueryable();
+            
             await OnTop3LikedBooksClick.InvokeAsync(top3LikedBooks);
             showingLikedBooks = true;
-
             buttonMessage = "Show all Books";
             buttonIcon = new Icons.Regular.Size16.Clipboard();
 

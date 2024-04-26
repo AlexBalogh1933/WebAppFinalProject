@@ -14,7 +14,10 @@
             <br />
 
             <FluentSelect ValueChanged="@(e => FilterSearchOption = e)" TOption="string">
+                <FluentIcon Value="@(new Icons.Regular.Size16.SearchVisual())" Color="@Color.Neutral" Slot="indicator" />
+
                 <FluentOption Value="title">Search Parameter Options</FluentOption>
+
                 <FluentOption Value="title">Title</FluentOption>
                 <FluentOption Value="genre">Genre</FluentOption>
                 <FluentOption Value="authorFirstName">Author's Firstname</FluentOption>
@@ -24,7 +27,7 @@
             <br />
             <br />
 
-            <FindLikedBookComponent Books="@authorBook" OnTop3LikedBooksClick="handleShowLikedBooks" />
+            <FindLikedBookComponent BookQuery="@BookQuery" OnTop3LikedBooksClick="HandleShowLikedBooks" />
 
             <br />
             <br />
@@ -34,135 +37,116 @@
             <br />
             <br />
 
-            <FluentAccordionItem Heading="Show Column Filter Options ">
-
+            <FluentAccordionItem Heading="Column Filters">
                 <FluentIcon Value="@(new Icons.Regular.Size20.Filter())" Color="@Color.Neutral" Slot="start" />
-                <FluentCheckbox @bind-Value="hideTitleColumn">Hide Titles</FluentCheckbox>
-                <FluentCheckbox @bind-Value="hideGenreColumn">Hide Genres</FluentCheckbox>
-                <FluentCheckbox @bind-Value="hideAuthorFirstNameColumn">Hide Author's Firstname</FluentCheckbox>
-                <br />
-
-                <FluentCheckbox @bind-Value="hideAuthorLastNameColumn">Hide Author's Lastname</FluentCheckbox>
-                <FluentCheckbox @bind-Value="hideNumberOfDislikes">Hide Author's Firstname</FluentCheckbox>
-                <FluentCheckbox @bind-Value="hideNumberOfLikes">Hide Author's Lastname</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hideAuthorInfo">Hide Author Info</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hideBookRating">Hide Book Rating</FluentCheckbox>
+                <FluentCheckbox @bind-Value="hidePublisherInfo">Hide Publisher Info</FluentCheckbox>
             </FluentAccordionItem>
-
-
-            
 
         </FluentCard>
     </FluentStack>
 </FluentCard>
 
-<FluentDataGrid  Items="@authorBook">
+<FluentDataGrid Items="@BookQuery">
 
-    @if (!hideTitleColumn)
+    <PropertyColumn Property="@(b => b.Item2.Title)" Sortable="true" />
+    <PropertyColumn Property="@(b => b.Item2.Genre)" Sortable="true" />
+
+
+    @if (!hideAuthorInfo)
     {
-        <PropertyColumn Property="@(b => b.Book.Title)" Sortable="true" />
+        <PropertyColumn Title="Author's First Name" Property="@(b => b.Item1.FirstName)" Sortable="true" />
+        <PropertyColumn Title="Author's Last Name" Property="@(b =>  b.Item1.LastName)" Sortable="true" />
     }
-    @if (!hideGenreColumn)
+
+    @if (!hideBookRating)
     {
-        <PropertyColumn Property="@(b => b.Book.Genre)" Sortable="true" />
+        <PropertyColumn Title="Total Dislikes" Property="@(b =>  b.Item2.NumberOfDislikes)" Sortable="true" />
+        <PropertyColumn Title="Total Likes" Property="@(b =>  b.Item2.NumberOfLikes)" Sortable="true" />
     }
-    @if (!hideNumberOfDislikes)
+
+    @if (!hidePublisherInfo)
     {
-        <PropertyColumn Title="Total Dislikes" Property="@(b =>  b.Book.NumberOfDislikes)" Sortable="true" />
+        <PropertyColumn Title="Publisher's Name" Property="@(b => b.Item3.Name)" Sortable="true" />
+        <PropertyColumn Title="Publisher's Address" Property="@(b =>  b.Item3.Address)" Sortable="true" />
+        <PropertyColumn Title="Date Published" Property="@(b =>  b.Item3.EstablishedYear)" Sortable="true" />
     }
-    @if (!hideNumberOfLikes)
-    {
-        <PropertyColumn Title="Total Likes" Property="@(b =>  b.Book.NumberOfLikes)" Sortable="true" />
-    }
-    @if (!hideAuthorFirstNameColumn)
-    {
-        <PropertyColumn Title="Author's First Name" Property="@(b => b.Author.FirstName)" Sortable="true" />
-    }
-    @if (!hideAuthorLastNameColumn)
-    {
-        <PropertyColumn Title="Author's Last Name" Property="@(b =>  b.Author.LastName)" Sortable="true" />
-    }
+
     <TemplateColumn>
-        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.Book.BookId}"))">Edit</FluentButton>
-        <FluentButton OnClick="@(()=> RemoveBook(context.Book))">Remove</FluentButton>
+        <FluentButton OnClick="@(()=> navigation.NavigateTo($"/bookDetails/{context.Item2.BookId}"))">Edit</FluentButton>
+        <FluentButton OnClick="@(()=> RemoveBook(context.Item2))">Remove</FluentButton>
     </TemplateColumn>
 
 </FluentDataGrid>
 
 @code {
-    IQueryable<BookAuthorJoinViewModel> authorBook { get; set; }
+    IQueryable<Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>>? BookQuery { get; set; }
 
     private bool displayBook = true;
 
-    bool hideTitleColumn = false;
-    bool hideGenreColumn = false;
-    bool hideAuthorFirstNameColumn = false;
-    bool hideAuthorLastNameColumn = false;
-    bool hideNumberOfLikes = false;
-    bool hideNumberOfDislikes= false;
+    bool hideBookRating = false;
+    bool hideAuthorInfo = false;
+    bool hidePublisherInfo = false;
 
     string? FilterSearchOption = "title";
 
-
     private async Task FindBook(ChangeEventArgs args)
     {
-        var input = args.Value.ToString();
+        var input = args.Value?.ToString();
 
-        var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
-        var AuthorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors")).AsQueryable();
-        var AuthorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks")).AsQueryable();
-
-        authorBook = 
-            (from booktb in booksTable
-            join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
-            join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
-            select new BookAuthorJoinViewModel
-            {
-                Book = booktb,
-                Author = authortb,
-
-            }).AsQueryable();
+        await SetBookQuery();
 
         if (FilterSearchOption == "title")
         {
-            authorBook = authorBook.Where(b => b.Book.Title.ToLower().StartsWith(input)).AsQueryable();
+            BookQuery = BookQuery.Where(b => b.Item2.Title.ToLower().StartsWith(input)).AsQueryable();
         }
         else if (FilterSearchOption == "genre")
         {
-            authorBook = authorBook.Where(b => b.Book.Genre.ToLower().StartsWith(input)).AsQueryable();
+            BookQuery = BookQuery.Where(b => b.Item2.Genre.ToLower().StartsWith(input)).AsQueryable();
         }
         else if (FilterSearchOption == "authorFirstName")
         {
-            authorBook = authorBook.Where(b => b.Author.FirstName.ToLower().StartsWith(input)).AsQueryable();
+            BookQuery = BookQuery.Where(b => b.Item1.FirstName.ToLower().StartsWith(input)).AsQueryable();
         }
         else if (FilterSearchOption == "authorLastName")
         {
-            authorBook = authorBook.Where(b => b.Author.LastName.ToLower().StartsWith(input)).AsQueryable();
+            BookQuery = BookQuery.Where(b => b.Item1.LastName.ToLower().StartsWith(input)).AsQueryable();
         }
     }
+
     protected override async Task OnParametersSetAsync()
     {
-        var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books")).AsQueryable();
-        var AuthorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors")).AsQueryable();
-        var AuthorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks")).AsQueryable();
-
-        authorBook = (from booktb in booksTable
-        join authorbooktb in AuthorBookTable on booktb.BookId equals authorbooktb.BookId
-        join authortb in AuthorTable on authorbooktb.AuthorId equals authortb.AuthorId
-        select new BookAuthorJoinViewModel
-        {
-            Book = booktb,
-            Author = authortb,
-
-        }).AsQueryable();
+        await SetBookQuery();
     }
+
+    public async Task SetBookQuery()
+    {
+        var booksTable = (await http.GetFromJsonAsync<List<BookViewModel>>("api/books"))?.AsQueryable();
+        var authorTable = (await http.GetFromJsonAsync<List<AuthorViewModel>>("api/authors"))?.AsQueryable();
+        var authorBookTable = (await http.GetFromJsonAsync<List<AuthorBookViewModel>>("api/authorbooks"))?.AsQueryable();
+        var publisherTable = (await http.GetFromJsonAsync<List<PublisherViewModel>>("api/publishers"))?.AsQueryable();
+
+        BookQuery = (from book in booksTable
+                     join authorbook in authorBookTable on book.BookId equals authorbook.BookId
+                     join author in authorTable on authorbook.AuthorId equals author.AuthorId
+                     join publisher in publisherTable on book.PublisherId equals publisher.PublisherId
+                     select new Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>(author, book, publisher)).AsQueryable();
+    }
+
 
     private async Task RemoveBook(BookViewModel book)
     {
+        await http.DeleteAsync($"/api/authorbook/{book.BookId}");
         await http.DeleteAsync($"/api/book/{book.BookId}");
+        await SetBookQuery();
+
     }
 
-    private void handleShowLikedBooks(IQueryable<BookAuthorJoinViewModel> top3LikedBooks)
+    private void HandleShowLikedBooks(IQueryable<Tuple<AuthorViewModel, BookViewModel, PublisherViewModel>> top3LikedBooks)
     {
-        authorBook = top3LikedBooks;
+        
+        BookQuery = top3LikedBooks;
         StateHasChanged();
     }
 

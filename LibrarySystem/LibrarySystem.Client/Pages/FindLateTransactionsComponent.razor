@@ -1,39 +1,43 @@
 ﻿@using LibrarySystem.Models
 @inject HttpClient http;
 
-<FluentButton IconStart="@(new Icons.Regular.Size16.Hourglass())" OnClick="findNotReturnedBooks">
+<FluentButton IconStart="@buttonIcon" OnClick="FindNotReturnedBooks">
     @buttonMessage
 </FluentButton>
 
 @code {
     [Parameter]
-    public EventCallback<IQueryable<TransactionViewModel>> onFindNotReturnedBooksClick { get; set; }
+    public EventCallback<IQueryable<TransactionViewModel>> OnFindNotReturnedBooksClick { get; set; }
 
     [Parameter]
-    public IQueryable<TransactionViewModel> Transactions { get; set; }
+    public IQueryable<TransactionViewModel>? Transactions { get; set; }
 
-    bool isShowingLateTransaction = false;
+    bool showingLateTransaction = false;
     string buttonMessage = "Show Late Transactions";
+    Icon buttonIcon = new Icons.Regular.Size16.Hourglass();
 
-    private async void findNotReturnedBooks()
+    private async Task FindNotReturnedBooks()
     {
-        if (!isShowingLateTransaction)
+        if (showingLateTransaction)
         {
             var lateReturns =
             (from transaction in Transactions
              where (int)(DateTime.Now - transaction.DateBorrowed).Value.Days > transaction.TotalDaysAllowedToBorrow
              select transaction).AsQueryable();
-            onFindNotReturnedBooksClick.InvokeAsync(lateReturns);
-            isShowingLateTransaction = true;
+
+            await OnFindNotReturnedBooksClick.InvokeAsync(lateReturns);
+            showingLateTransaction = false;
             buttonMessage = "Show All Transactions";
+            buttonIcon = new Icons.Regular.Size16.Clipboard();
         }
         else
         {
             var allTransactions = (await http.GetFromJsonAsync<List<TransactionViewModel>>("api/transactions")).AsQueryable();
-            onFindNotReturnedBooksClick.InvokeAsync(allTransactions);
-
-            isShowingLateTransaction = false;
+            
+            await OnFindNotReturnedBooksClick.InvokeAsync(allTransactions);
+            showingLateTransaction = true;
             buttonMessage = "Show Late Transactions";
+            buttonIcon = new Icons.Regular.Size16.Hourglass();
         }
 
     }
